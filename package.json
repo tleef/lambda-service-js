@@ -1,5 +1,5 @@
 {
-  "name": "@tleef/service-js",
+  "name": "@tleef/lambda-service-js",
   "version": "1.0.0",
   "main": "lib/service.js",
   "scripts": {
@@ -9,13 +9,13 @@
     "test-coverage": "nyc yarn test",
     "prepare": "yarn build"
   },
-  "repository": "git+https://github.com/tleef/service-js.git",
+  "repository": "git+https://github.com/tleef/lambda-service-js.git",
   "author": "Tom Lee",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tleef/service-js/issues"
+    "url": "https://github.com/tleef/lambda-service-js/issues"
   },
-  "homepage": "https://github.com/tleef/service-js#readme",
+  "homepage": "https://github.com/tleef/lambda-service-js#readme",
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.56",
     "@babel/core": "^7.0.0-beta.56",

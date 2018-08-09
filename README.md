@@ -1,1 +1,1 @@
-# service-js
+# lambda-service-js
