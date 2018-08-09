@@ -6,9 +6,9 @@ import parsers from './parsers'
 export default (opts = {}) => {
   return (target, name, descriptor) => {
     const original = descriptor.value
-    if (typeof original === 'function') {
+    if (type.isFunction(original)) {
       descriptor.value = function (ctx, event) {
-        let body
+        let body = event && event.body
 
         if (opts.bodyParser === 'json') {
           opts.bodyParser = parsers.json
@@ -16,7 +16,7 @@ export default (opts = {}) => {
 
         if (type.isFunction(opts.bodyParser)) {
           try {
-            body = opts.bodyParser(event.body)
+            body = opts.bodyParser(body)
           } catch (e) {
             this.log('error while parsing body', {
               request_id: ctx.id,
@@ -45,7 +45,7 @@ export default (opts = {}) => {
         let res
 
         try {
-          res = original.call(this, body)
+          res = original.call(this, ctx, body)
         } catch (e) {
           const status = e.status || statusCodes.InternalServerError
           let message = e.message || 'Internal Server Error'
