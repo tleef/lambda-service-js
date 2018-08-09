@@ -7,4 +7,3 @@ export default class Service {
     this.log = this.logger.log
   }
 }
-

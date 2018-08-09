@@ -1,4 +1,7 @@
-import response, {data, error} from '@tleef/lambda-response-js'
+import type from '@tleef/type-js'
+import response, { data, error, statusCodes } from '@tleef/lambda-response-js'
+
+import parsers from './parsers'
 
 export default (opts = {}) => {
   return (target, name, descriptor) => {
@@ -7,13 +10,13 @@ export default (opts = {}) => {
       descriptor.value = function (ctx, event) {
         let body
 
-        if (opts.body === 'json') {
+        if (opts.bodyParser === 'json') {
+          opts.bodyParser = parsers.json
+        }
+
+        if (type.isFunction(opts.bodyParser)) {
           try {
-            if (type.isString(event.body)) {
-              body = JSON.parse(event.body)
-            } else {
-              body = event.body
-            }
+            body = opts.bodyParser(event.body)
           } catch (e) {
             this.log('error while parsing body', {
               request_id: ctx.id,
@@ -21,12 +24,22 @@ export default (opts = {}) => {
               error: e.message
             })
 
-            return response(ctx, 400, error('Unable to parse body'))
+            return response(ctx, statusCodes.BadRequest, error('Unable to parse body'))
           }
         }
 
-        if (opts.body && !body) {
-          return response(ctx, 400, error('body is required'))
+        if (opts.bodyRequired && !body) {
+          return response(ctx, statusCodes.BadRequest, error('body is required'))
+        }
+
+        if (opts.bodySchema) {
+          let r = opts.bodySchema.validate(body)
+
+          if (r.error) {
+            return response(ctx, statusCodes.BadRequest, error('body is invalid'))
+          }
+
+          body = r.value
         }
 
         let res
@@ -34,10 +47,10 @@ export default (opts = {}) => {
         try {
           res = original.call(this, body)
         } catch (e) {
-          const status = e.status || 500
+          const status = e.status || statusCodes.InternalServerError
           let message = e.message || 'Internal Server Error'
 
-          if (status === 500) {
+          if (status === statusCodes.InternalServerError) {
             message = 'Internal Server Error'
 
             this.log('error while calling endpoint', {
@@ -50,7 +63,22 @@ export default (opts = {}) => {
           return response(ctx, status, error(message))
         }
 
-        return response(ctx, 200, data(res))
+        if (opts.resSchema) {
+          let r = opts.resSchema.validate(res)
+
+          if (r.error) {
+            this.log('res is invalid', {
+              request_id: ctx.id,
+              endpoint: name
+            })
+
+            return response(ctx, statusCodes.InternalServerError, error('Internal Server Error'))
+          }
+
+          res = r.value
+        }
+
+        return response(ctx, statusCodes.OK, data(res))
       }
     }
     return descriptor

@@ -2,7 +2,7 @@
 
 import chai from 'chai'
 
-import endpoint from './endpoint'
+import parsers, { json } from './parsers'
 
 const expect = chai.expect
 

@@ -33,6 +33,7 @@
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.56",
     "@tleef/lambda-response-js": "^1.0.0",
-    "@tleef/log-js": "^1.1.0"
+    "@tleef/log-js": "^1.1.0",
+    "@tleef/type-js": "^1.3.2"
   }
 }
