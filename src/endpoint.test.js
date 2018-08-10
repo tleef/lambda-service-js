@@ -5,7 +5,7 @@ import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import Context from '@tleef/context-js'
 import { statusCodes } from '@tleef/lambda-response-js'
-import joi from 'joi'
+import joi from '@tleef/joi'
 
 import endpoint from './endpoint'
 import {ServiceError} from './service'
