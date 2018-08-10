@@ -47,10 +47,10 @@ export default (opts = {}) => {
         try {
           res = original.call(this, ctx, body)
         } catch (e) {
-          const status = e.status || statusCodes.InternalServerError
+          const statusCode = e.statusCode || statusCodes.InternalServerError
           let message = e.message || 'Internal Server Error'
 
-          if (status === statusCodes.InternalServerError) {
+          if (statusCode === statusCodes.InternalServerError) {
             message = 'Internal Server Error'
 
             this.log('error while calling endpoint', {
@@ -60,7 +60,7 @@ export default (opts = {}) => {
             })
           }
 
-          return response(ctx, status, error(message))
+          return response(ctx, statusCode, error(message))
         }
 
         if (opts.resSchema) {

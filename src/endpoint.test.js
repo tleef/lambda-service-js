@@ -8,6 +8,7 @@ import { statusCodes } from '@tleef/lambda-response-js'
 import joi from 'joi'
 
 import endpoint from './endpoint'
+import {ServiceError} from './service'
 
 const expect = chai.expect
 
@@ -15,7 +16,7 @@ chai.use(sinonChai)
 
 describe('endpoint', () => {
   it('be callable without arguments', () => {
-    expect(() => endpoint()).not.to.throw()
+    expect(() => endpoint()).to.not.throw()
   })
 
   it('should return a decorator function', () => {
@@ -198,12 +199,84 @@ describe('endpoint', () => {
     })
   })
 
+  it('should handle errors from original', () => {
+    const original = sinon.stub().throws(new ServiceError('original error', statusCodes.BadRequest))
+    const ctx = new Context()
+
+    const decorator = endpoint()
+    const descriptor = decorator('target', 'name', {value: original})
+
+    const res = descriptor.value(ctx)
+
+    expect(res.statusCode).to.equal(statusCodes.BadRequest)
+    expect(JSON.parse(res.body)).to.deep.equal({
+      status: statusCodes.BadRequest,
+      request_id: ctx.id,
+      error: {
+        message: 'original error'
+      }
+    })
+  })
+
+  it('should log error from original is an InternalServiceError', () => {
+    const original = sinon.stub().throws(new ServiceError('original error', statusCodes.InternalServerError))
+    const self = {
+      log: sinon.spy()
+    }
+    const ctx = new Context()
+
+    const decorator = endpoint()
+    const descriptor = decorator('target', 'name', {value: original})
+
+    const res = descriptor.value.call(self, ctx)
+
+    expect(self.log).to.have.callCount(1)
+    expect(self.log).to.have.been.calledWith('error while calling endpoint')
+    expect(res.statusCode).to.equal(statusCodes.InternalServerError)
+    expect(JSON.parse(res.body)).to.deep.equal({
+      status: statusCodes.InternalServerError,
+      request_id: ctx.id,
+      error: {
+        message: 'Internal Server Error'
+      }
+    })
+  })
+
+  it('should default error from original to an InternalServiceError', () => {
+    const original = sinon.stub().throws(new Error())
+    const self = {
+      log: sinon.spy()
+    }
+    const ctx = new Context()
+
+    const decorator = endpoint()
+    const descriptor = decorator('target', 'name', {value: original})
+
+    const res = descriptor.value.call(self, ctx)
+
+    expect(res.statusCode).to.equal(statusCodes.InternalServerError)
+    expect(JSON.parse(res.body)).to.deep.equal({
+      status: statusCodes.InternalServerError,
+      request_id: ctx.id,
+      error: {
+        message: 'Internal Server Error'
+      }
+    })
+  })
+
   describe('decorator', () => {
     it('should return a descriptor', () => {
       const decorator = endpoint()
       const descriptor = decorator('target', 'name', {value: () => {}})
       expect(descriptor).to.be.an('object')
       expect(descriptor.value).to.be.a('function')
+    })
+
+    it('should return original descriptor if descriptor.value is not a function', () => {
+      const decorator = endpoint()
+      const originalDescriptor = {value: 'test'}
+      const descriptor = decorator('target', 'name', originalDescriptor)
+      expect(descriptor).to.equal(originalDescriptor)
     })
   })
 
