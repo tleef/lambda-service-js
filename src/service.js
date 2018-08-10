@@ -1,6 +1,9 @@
 import { main } from '@tleef/log-js'
 import { statusCodes } from '@tleef/lambda-response-js'
 
+import endpoint from './endpoint'
+import parsers from './parsers'
+
 export default class Service {
   constructor (name) {
     this.name = name || 'unknown'
@@ -24,5 +27,7 @@ class ServiceError extends Error {
 }
 
 export {
-  ServiceError
+  ServiceError,
+  endpoint,
+  parsers
 }
