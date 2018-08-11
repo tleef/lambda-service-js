@@ -7,7 +7,7 @@ export default (opts = {}) => {
   return (target, name, descriptor) => {
     const original = descriptor.value
     if (type.isFunction(original)) {
-      descriptor.value = function (ctx, event) {
+      descriptor.value = async function (ctx, event) {
         let body = event && event.body
 
         if (opts.bodyParser === 'json') {
@@ -45,7 +45,7 @@ export default (opts = {}) => {
         let res
 
         try {
-          res = original.call(this, ctx, body)
+          res = await original.call(this, ctx, body)
         } catch (e) {
           const statusCode = e.statusCode || statusCodes.InternalServerError
           let message = e.message || 'Internal Server Error'

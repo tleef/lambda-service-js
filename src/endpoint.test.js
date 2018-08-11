@@ -45,7 +45,7 @@ describe('endpoint', () => {
     expect(original).to.be.have.been.calledWithExactly(ctx, o)
   })
 
-  it('should log and return 400 if unable to parse body', () => {
+  it('should log and return 400 if unable to parse body', async () => {
     const original = sinon.spy()
     const opts = {
       bodyParser: 'json'
@@ -61,7 +61,7 @@ describe('endpoint', () => {
     const decorator = endpoint(opts)
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value.call(self, ctx, event)
+    const res = await descriptor.value.call(self, ctx, event)
 
     expect(original).to.have.callCount(0)
     expect(self.log).to.have.callCount(1)
@@ -76,7 +76,7 @@ describe('endpoint', () => {
     })
   })
 
-  it('should return 400 if body is missing when required', () => {
+  it('should return 400 if body is missing when required', async () => {
     const original = sinon.spy()
     const opts = {
       bodyRequired: true
@@ -86,7 +86,7 @@ describe('endpoint', () => {
     const decorator = endpoint(opts)
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value(ctx)
+    const res = await descriptor.value(ctx)
 
     expect(original).to.have.callCount(0)
     expect(res.statusCode).to.equal(statusCodes.BadRequest)
@@ -118,7 +118,7 @@ describe('endpoint', () => {
     expect(original).to.have.been.calledWithExactly(ctx, body)
   })
 
-  it('should invalidate body with schema', () => {
+  it('should invalidate body with schema', async () => {
     const original = sinon.spy()
     const opts = {
       bodySchema: joi.object().keys({
@@ -131,7 +131,7 @@ describe('endpoint', () => {
     const decorator = endpoint(opts)
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value(ctx, {body})
+    const res = await descriptor.value(ctx, {body})
 
     expect(original).to.have.callCount(0)
     expect(res.statusCode).to.equal(statusCodes.BadRequest)
@@ -144,7 +144,7 @@ describe('endpoint', () => {
     })
   })
 
-  it('should validate res with schema', () => {
+  it('should validate res with schema', async () => {
     const data = {one: 1}
     const original = sinon.stub().returns(data)
     const opts = {
@@ -157,7 +157,7 @@ describe('endpoint', () => {
     const decorator = endpoint(opts)
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value(ctx)
+    const res = await descriptor.value(ctx)
 
     expect(original).to.have.callCount(1)
     expect(res.statusCode).to.equal(statusCodes.OK)
@@ -168,7 +168,7 @@ describe('endpoint', () => {
     })
   })
 
-  it('should log and invalidate res with schema', () => {
+  it('should log and invalidate res with schema', async () => {
     const data = {two: 1}
     const original = sinon.stub().returns(data)
     const self = {
@@ -184,7 +184,7 @@ describe('endpoint', () => {
     const decorator = endpoint(opts)
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value.call(self, ctx)
+    const res = await descriptor.value.call(self, ctx)
 
     expect(original).to.have.callCount(1)
     expect(self.log).to.have.callCount(1)
@@ -199,14 +199,14 @@ describe('endpoint', () => {
     })
   })
 
-  it('should handle errors from original', () => {
+  it('should handle errors from original', async () => {
     const original = sinon.stub().throws(new ServiceError('original error', statusCodes.BadRequest))
     const ctx = new Context()
 
     const decorator = endpoint()
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value(ctx)
+    const res = await descriptor.value(ctx)
 
     expect(res.statusCode).to.equal(statusCodes.BadRequest)
     expect(JSON.parse(res.body)).to.deep.equal({
@@ -218,7 +218,7 @@ describe('endpoint', () => {
     })
   })
 
-  it('should log error from original is an InternalServiceError', () => {
+  it('should log error from original is an InternalServiceError', async () => {
     const original = sinon.stub().throws(new ServiceError('original error', statusCodes.InternalServerError))
     const self = {
       log: sinon.spy()
@@ -228,7 +228,7 @@ describe('endpoint', () => {
     const decorator = endpoint()
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value.call(self, ctx)
+    const res = await descriptor.value.call(self, ctx)
 
     expect(self.log).to.have.callCount(1)
     expect(self.log).to.have.been.calledWith('error while calling endpoint')
@@ -242,7 +242,7 @@ describe('endpoint', () => {
     })
   })
 
-  it('should default error from original to an InternalServiceError', () => {
+  it('should default error from original to an InternalServiceError', async () => {
     const original = sinon.stub().throws(new Error())
     const self = {
       log: sinon.spy()
@@ -252,7 +252,7 @@ describe('endpoint', () => {
     const decorator = endpoint()
     const descriptor = decorator('target', 'name', {value: original})
 
-    const res = descriptor.value.call(self, ctx)
+    const res = await descriptor.value.call(self, ctx)
 
     expect(res.statusCode).to.equal(statusCodes.InternalServerError)
     expect(JSON.parse(res.body)).to.deep.equal({
