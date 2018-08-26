@@ -667,9 +667,9 @@
     "@tleef/topo" "^3.0.0-r.1"
     isemail "3.x.x"
 
-"@tleef/lambda-response-js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@tleef/lambda-response-js/-/lambda-response-js-1.0.0.tgz#bb8304a1ba88e7ff180a6e9cb15207db787a8768"
+"@tleef/lambda-response-js@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@tleef/lambda-response-js/-/lambda-response-js-1.1.0.tgz#83c3565a97a2fbca5d564a62dbd6a8dcaf428158"
   dependencies:
     "@babel/runtime" "^7.0.0-beta.56"
     "@tleef/context-js" "^1.1.0"

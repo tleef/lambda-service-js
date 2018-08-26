@@ -68,7 +68,7 @@ describe('endpoint', () => {
     expect(self.log).to.have.been.calledWith('error while parsing body')
     expect(res.statusCode).to.equal(statusCodes.BadRequest)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.BadRequest,
+      status_code: statusCodes.BadRequest,
       request_id: ctx.id,
       error: {
         message: 'Unable to parse body'
@@ -91,7 +91,7 @@ describe('endpoint', () => {
     expect(original).to.have.callCount(0)
     expect(res.statusCode).to.equal(statusCodes.BadRequest)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.BadRequest,
+      status_code: statusCodes.BadRequest,
       request_id: ctx.id,
       error: {
         message: 'body is required'
@@ -136,7 +136,7 @@ describe('endpoint', () => {
     expect(original).to.have.callCount(0)
     expect(res.statusCode).to.equal(statusCodes.BadRequest)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.BadRequest,
+      status_code: statusCodes.BadRequest,
       request_id: ctx.id,
       error: {
         message: 'body is invalid'
@@ -162,7 +162,7 @@ describe('endpoint', () => {
     expect(original).to.have.callCount(1)
     expect(res.statusCode).to.equal(statusCodes.OK)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.OK,
+      status_code: statusCodes.OK,
       request_id: ctx.id,
       data
     })
@@ -191,7 +191,7 @@ describe('endpoint', () => {
     expect(self.log).to.have.been.calledWith('res is invalid')
     expect(res.statusCode).to.equal(statusCodes.InternalServerError)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.InternalServerError,
+      status_code: statusCodes.InternalServerError,
       request_id: ctx.id,
       error: {
         message: 'Internal Server Error'
@@ -210,7 +210,7 @@ describe('endpoint', () => {
 
     expect(res.statusCode).to.equal(statusCodes.BadRequest)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.BadRequest,
+      status_code: statusCodes.BadRequest,
       request_id: ctx.id,
       error: {
         message: 'original error'
@@ -234,7 +234,7 @@ describe('endpoint', () => {
     expect(self.log).to.have.been.calledWith('error while calling endpoint')
     expect(res.statusCode).to.equal(statusCodes.InternalServerError)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.InternalServerError,
+      status_code: statusCodes.InternalServerError,
       request_id: ctx.id,
       error: {
         message: 'Internal Server Error'
@@ -256,7 +256,7 @@ describe('endpoint', () => {
 
     expect(res.statusCode).to.equal(statusCodes.InternalServerError)
     expect(JSON.parse(res.body)).to.deep.equal({
-      status: statusCodes.InternalServerError,
+      status_code: statusCodes.InternalServerError,
       request_id: ctx.id,
       error: {
         message: 'Internal Server Error'
