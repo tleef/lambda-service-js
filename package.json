@@ -1,6 +1,6 @@
 {
   "name": "@tleef/lambda-service-js",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "lib/service.js",
   "scripts": {
     "build": "babel src --out-dir lib",
