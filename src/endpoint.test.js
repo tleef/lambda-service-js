@@ -34,7 +34,8 @@ describe('endpoint', () => {
     }
     const ctx = new Context()
     const event = {
-      body: JSON.stringify(o)
+      body: JSON.stringify(o),
+      headers: 'headers'
     }
 
     const decorator = endpoint(opts)
@@ -42,7 +43,7 @@ describe('endpoint', () => {
 
     descriptor.value(ctx, event)
 
-    expect(original).to.be.have.been.calledWithExactly(ctx, o)
+    expect(original).to.be.have.been.calledWithExactly(ctx, o, 'headers')
   })
 
   it('should log and return 400 if unable to parse body', async () => {
@@ -112,10 +113,10 @@ describe('endpoint', () => {
     const decorator = endpoint(opts)
     const descriptor = decorator('target', 'name', {value: original})
 
-    descriptor.value(ctx, {body})
+    descriptor.value(ctx, {body, headers: 'headers'})
 
     expect(original).to.have.callCount(1)
-    expect(original).to.have.been.calledWithExactly(ctx, body)
+    expect(original).to.have.been.calledWithExactly(ctx, body, 'headers')
   })
 
   it('should invalidate body with schema', async () => {

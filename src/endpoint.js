@@ -9,6 +9,7 @@ export default (opts = {}) => {
     if (type.isFunction(original)) {
       descriptor.value = async function (ctx, event) {
         let body = event && event.body
+        let headers = event && event.headers
 
         if (opts.bodyParser === 'json') {
           opts.bodyParser = parsers.json
@@ -45,7 +46,7 @@ export default (opts = {}) => {
         let res
 
         try {
-          res = await original.call(this, ctx, body)
+          res = await original.call(this, ctx, body, headers)
         } catch (e) {
           const statusCode = e.statusCode || statusCodes.InternalServerError
           let message = e.message || 'Internal Server Error'
